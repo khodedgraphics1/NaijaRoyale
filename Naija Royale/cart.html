@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Cart | Naija Royale Restaurant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .remove-btn { background: #e74c3c; color: #fff; border: none; border-radius: 12px; padding: 4px 12px; cursor: pointer; margin-left: 10px; }
+    .remove-btn:hover { background: #c0392b; }
+    .cart-list { list-style: none; padding: 0; margin: 0 0 1em 0; }
+    .cart-list li { margin-bottom: 0.5em; }
+  </style>
+</head>
+<body>
+  <section class="hero" style="background-image: url('https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=1500&q=80');">
+    <h1>Your Cart</h1>
+    <a href="menu.html" class="cta-button">Back to Menu</a>
+  </section>
+  <section class="about">
+    <h2>Order Summary</h2>
+    <div id="cart-items-total" style="font-weight:bold;margin-bottom:10px;">Total Items: 0</div>
+    <ul class="cart-list" id="cart-list"></ul>
+    <div class="cart-total" id="cart-total">Total: ₦0</div>
+    <a href="checkout.html" class="cta-button" id="checkout-btn">Proceed to Checkout</a>
+  </section>
+  <footer>
+    &copy; 2025 Naija Royale Restaurant. All rights reserved.
+  </footer>
+  <script>
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    function renderCart() {
+      const cartList = document.getElementById('cart-list');
+      cartList.innerHTML = '';
+      let total = 0;
+      let totalItems = 0;
+      if (cart.length === 0) {
+        cartList.innerHTML = '<li>Your cart is empty.</li>';
+        document.getElementById('checkout-btn').style.display = 'none';
+      } else {
+        document.getElementById('checkout-btn').style.display = 'inline-block';
+        cart.forEach((item, idx) => {
+          total += item.price * item.qty;
+          totalItems += item.qty;
+          const li = document.createElement('li');
+          li.innerHTML = `
+            ${item.name} 
+            <button onclick="changeQty(${idx}, -1)" style="background:#e67e22;color:#fff;border:none;border-radius:50%;width:28px;height:28px;font-size:1.2em;">-</button>
+            x${item.qty}
+            <button onclick="changeQty(${idx}, 1)" style="background:#27ae60;color:#fff;border:none;border-radius:50%;width:28px;height:28px;font-size:1.2em;">+</button>
+            - ₦${(item.price * item.qty).toLocaleString()} 
+            <button class='remove-btn' onclick='removeFromCart(${idx})'>Remove</button>`;
+          cartList.appendChild(li);
+        });
+      }
+      document.getElementById('cart-total').textContent = `Total: ₦${total.toLocaleString()}`;
+      document.getElementById('cart-items-total').textContent = `Total Items: ${totalItems}`;
+    }
+    function changeQty(idx, delta) {
+      cart[idx].qty += delta;
+      if (cart[idx].qty <= 0) {
+        cart.splice(idx, 1);
+      }
+      localStorage.setItem('cart', JSON.stringify(cart));
+      renderCart();
+    }
+    function removeFromCart(idx) {
+      cart.splice(idx, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      renderCart();
+    }
+    renderCart();
+  </script>
+</body>
+</html>
